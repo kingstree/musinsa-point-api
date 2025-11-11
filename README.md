@@ -162,6 +162,10 @@ src/
     - 로컬 H2 → PostgreSQL
     - 이후 AWS Aurora PostgreSQL 클러스터 환경으로 확장
 
+- ✅ **테스트 자동화 구축**
+    - JUnit 5 + Spring Boot Test로 서비스/리포지토리 단위 테스트 표준화
+    - CI 파이프라인(GitHub Actions)에서 `./gradlew test` 자동 실행 및 캐시 최적화
+
 ---
 
 ## 👨‍💻 작성자

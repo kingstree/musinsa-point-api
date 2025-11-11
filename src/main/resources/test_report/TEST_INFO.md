@@ -3,7 +3,7 @@
 ![[Pasted image 20251111163220.png]](./attachments/Pasted_image_20251111163220.png)
 ## 2. 1회 적립당, 멤버별 포인트 최대 보유 한도 등 정책은 DB 및 cache로 관리된다.
    #### 캐쉬 조회
-![[Pasted image 20251111164017.png]](./attachments/Pasted image 20251111164017.png)
+![[Pasted image 20251111164017.png]](./attachments/Pasted%20image%2020251111164017.png)
 #### 시스템 스타트 시 캐쉬조회 내역
 ```json
 {
