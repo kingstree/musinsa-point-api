@@ -3,7 +3,6 @@ package musinsa.points.common.security.service;
 
 import musinsa.points.domain.entity.Member;
 import musinsa.points.domain.enums.UserRole;
-
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**

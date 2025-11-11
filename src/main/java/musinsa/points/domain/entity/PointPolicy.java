@@ -3,11 +3,12 @@ package musinsa.points.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import musinsa.points.common.entity.BaseTimeEntity;
+import musinsa.points.common.exception.BusinessException;
+import musinsa.points.common.exception.ErrorCode;
 import musinsa.points.domain.enums.PointPolicyType;
 import musinsa.points.domain.enums.PolicyScope;
 import org.hibernate.annotations.Comment;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -71,7 +72,7 @@ public class PointPolicy extends BaseTimeEntity {
 
     public void setPolicyValue(Long policyValue) {
         if (policyValue == null || policyValue < 0) {
-            throw new IllegalArgumentException("policyValue must be non-null and non-negative");
+            throw new BusinessException(ErrorCode.INVALID_TYPE, "정책 값은 null이거나 음수일 수 없습니다.");
         }
         this.policyValue = policyValue;
     }

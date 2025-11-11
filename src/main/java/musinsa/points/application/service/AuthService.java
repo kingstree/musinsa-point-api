@@ -8,9 +8,10 @@ import musinsa.points.common.security.jwt.JwtUtil;
 import musinsa.points.domain.entity.Member;
 import musinsa.points.infrastructure.repository.MemberRepository;
 import musinsa.points.presentation.dto.request.LoginRequest;
-import org.springframework.stereotype.Service;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.stereotype.Service;
+
 import java.time.Instant;
 
 @Service

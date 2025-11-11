@@ -1,8 +1,8 @@
 package musinsa.points.presentation.dto.response;
 
 import java.time.Instant;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 포인트 사용 취소 응답 DTO

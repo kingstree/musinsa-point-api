@@ -2,7 +2,6 @@ package musinsa.points.common.log.util;
 
 import musinsa.points.common.log.TraceAndCacheFilter;
 import org.slf4j.MDC;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;

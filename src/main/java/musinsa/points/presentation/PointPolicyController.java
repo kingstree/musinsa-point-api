@@ -4,14 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import musinsa.points.application.service.PointPolicyService;
 import musinsa.points.common.exception.ErrorCode;
 import musinsa.points.common.response.ApiResult;
 import musinsa.points.common.response.ResponseUtil;
 import musinsa.points.common.security.service.CustomUserDetailsInfo;
-import musinsa.points.domain.enums.UserRole;
-
 import musinsa.points.presentation.dto.request.UpdateMemberPointPolicyRequest;
 import musinsa.points.presentation.dto.response.UpdateMemberPointPolicyResponse;
 import org.springframework.http.ResponseEntity;

@@ -10,7 +10,6 @@ import musinsa.points.common.log.dto.ResponseLog;
 import musinsa.points.common.log.util.LogSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;

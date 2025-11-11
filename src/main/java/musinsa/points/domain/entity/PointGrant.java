@@ -59,7 +59,8 @@ public class PointGrant extends BaseTimeEntity {
                                     Instant grantedAt,
                                     Instant expiresAt,
                                     String note) {
-        if (amount <= 0) throw new IllegalArgumentException("amount must be > 0");
+        if (amount <= 0)
+            throw new BusinessException(ErrorCode.INVALID_REQUEST, "적립 금액은 0보다 커야 합니다.");
         PointGrant grant = PointGrant.builder()
                 .member(member)
                 .amount(amount)

@@ -3,7 +3,6 @@ package musinsa.points.application.command;
 import lombok.Builder;
 import lombok.Getter;
 
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -23,19 +22,6 @@ public class CancelPointCommand {
     private final String reason;              // 취소 사유
     private final Instant requestedAt;        // 취소 요청 시각
 
-    /**
-     * Member 엔티티를 Command와 함께 사용할 수 있도록 변환하는 헬퍼
-     */
-    /*
-     public Member toMemberEntity() {
-        Member member = new Member();
-        member.setMemberSeq(this.memberSeq);
-        return member;
-    }*/
-
-    /**
-     * 기본값 자동 보정용 팩토리 메서드
-     */
     public static CancelPointCommand of(
             UUID grantId,
             UUID useId,

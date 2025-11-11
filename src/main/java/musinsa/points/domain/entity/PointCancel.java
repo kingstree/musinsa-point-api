@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import musinsa.points.common.entity.BaseTimeEntity;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Entity

@@ -2,24 +2,20 @@ package musinsa.points.application.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import musinsa.points.domain.entity.Member;
+import musinsa.points.domain.entity.PointPolicy;
+import musinsa.points.domain.enums.PointPolicyType;
+import musinsa.points.domain.enums.PolicyScope;
 import musinsa.points.domain.snapshot.PolicySnapshot;
+import musinsa.points.infrastructure.repository.PointPolicyJpaRepository;
 import musinsa.points.presentation.dto.response.UpdateMemberPointPolicyResponse;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import musinsa.points.domain.entity.PointPolicy;
-import musinsa.points.domain.enums.PointPolicyType;
-import musinsa.points.domain.enums.PolicyScope;
-import musinsa.points.infrastructure.repository.PointPolicyJpaRepository;
-
 import java.util.stream.Collectors;
-
-import org.springframework.cache.CacheManager;
 
 @Service
 @RequiredArgsConstructor

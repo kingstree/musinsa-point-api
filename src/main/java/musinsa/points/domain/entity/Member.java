@@ -2,7 +2,6 @@ package musinsa.points.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import musinsa.points.common.entity.BaseTimeEntity;
 import musinsa.points.domain.enums.UserRole;
 

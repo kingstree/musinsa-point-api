@@ -1,7 +1,8 @@
 package musinsa.points.application.command;
 
-import java.util.UUID;
 import lombok.Builder;
+
+import java.util.UUID;
 
 /**
  * 포인트 사용 취소 Command

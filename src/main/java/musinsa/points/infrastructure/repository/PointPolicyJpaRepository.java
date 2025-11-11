@@ -1,8 +1,8 @@
 package musinsa.points.infrastructure.repository;
 
 import musinsa.points.domain.entity.PointPolicy;
-import musinsa.points.domain.enums.PolicyScope;
 import musinsa.points.domain.enums.PointPolicyType;
+import musinsa.points.domain.enums.PolicyScope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
