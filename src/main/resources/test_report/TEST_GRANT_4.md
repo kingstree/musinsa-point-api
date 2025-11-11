@@ -10,9 +10,9 @@
 ----
 
 ##### 관리자 수기 적립
-![Pasted image 20251111181221](./attachments/Pasted image 20251111181221.png)
+![Pasted image 20251111181221](./attachments/Pasted%20image%2020251111181221.png)
 
 ##### 멤버 적립
-![Pasted image 20251111181328](./attachments/Pasted image 20251111181328.png)
+![Pasted image 20251111181328](./attachments/Pasted%20image%2020251111181328.png)
 ##### DB 내역
-![Pasted image 20251111181449](./attachments/Pasted image 20251111181449.png)
+![Pasted image 20251111181449](./attachments/Pasted%20image%2020251111181449.png)

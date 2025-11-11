@@ -25,13 +25,13 @@
 ---
 
 ### 멤버 1의 요청내역
-![Pasted image 20251111175906](./attachments/Pasted image 20251111175906.png)
+![Pasted image 20251111175906](./attachments/Pasted%20image%2020251111175906.png)
 
 ### 멤버 2의 요청내역 ( 멤버 1과 한도가 다름 )
-![Pasted image 20251111180105](./attachments/Pasted image 20251111180105.png)
+![Pasted image 20251111180105](./attachments/Pasted%20image%2020251111180105.png)
 
 ### 멤버2의 최대 한도 갱신 ( 111,000 ->200,000 )
-![Pasted image 20251111180215](./attachments/Pasted image 20251111180215.png)
+![Pasted image 20251111180215](./attachments/Pasted%20image%2020251111180215.png)
 
 ### 멤버 2의 최대 한도 갱신 확인
-![Pasted image 20251111180325](./attachments/Pasted image 20251111180325.png)
+![Pasted image 20251111180325](./attachments/Pasted%20image%2020251111180325.png)

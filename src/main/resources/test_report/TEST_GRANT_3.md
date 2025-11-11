@@ -2,4 +2,4 @@
 
     특정 시점에 적립된 포인트는 1원단위까지 어떤 주문에서 사용되었는지 추적할수 있어야 한다.
 
-![Pasted image 20251111193318](./attachments/Pasted image 20251111193318.png)
+![Pasted image 20251111193318](./attachments/Pasted%20image%2020251111193318.png)
