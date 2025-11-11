@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Configuration //이 클래스가 스프링 설정을 위한 클래스임을 나타낸다.
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-public class DataConfig { // 지속성 엔티티에 대한 감사 활성화
+public class JpaAuditConfig { // 지속성 엔티티에 대한 감사 활성화
 
     @Bean
     AuditorAware<Integer> auditorAware() {
