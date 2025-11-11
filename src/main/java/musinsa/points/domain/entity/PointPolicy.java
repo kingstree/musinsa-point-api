@@ -67,6 +67,12 @@ public class PointPolicy extends BaseTimeEntity {
 
     public void updateValue(Long newValue, Long modifier) {
         this.policyValue = newValue;
+    }
 
+    public void setPolicyValue(Long policyValue) {
+        if (policyValue == null || policyValue < 0) {
+            throw new IllegalArgumentException("policyValue must be non-null and non-negative");
+        }
+        this.policyValue = policyValue;
     }
 }

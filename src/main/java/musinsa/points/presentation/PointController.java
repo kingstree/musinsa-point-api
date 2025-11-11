@@ -68,7 +68,7 @@ public class PointController {
         if (userDetailsInfo.getRole() != UserRole.MANAGER && setGrantType != GrantType.REGRANT  ) {
             setGrantType = GrantType.AUTO;
         }
-        // 재 부여는 고민중...
+
         /**
          * * 1.취소 로직을 확인하는 절차가 있으면 좋음
          * * 2.재 부여는 이벤트 발생 시 이벤트 핸들러로 요청이 들어오면 좋음
@@ -174,6 +174,8 @@ public class PointController {
         CancelUsedPointResponse response = pointService.cancelUsedPoints(command);
         return ResponseUtil.success("성공", response);
     }
+
+
 
 
 }

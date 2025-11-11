@@ -2,11 +2,13 @@ package musinsa.points.infrastructure.repository;
 
 import musinsa.points.domain.entity.PointPolicy;
 import musinsa.points.domain.enums.PolicyScope;
+import musinsa.points.domain.enums.PointPolicyType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PointPolicyJpaRepository extends JpaRepository<PointPolicy, UUID> {
@@ -54,5 +56,22 @@ public interface PointPolicyJpaRepository extends JpaRepository<PointPolicy, UUI
     List<PointPolicy> findByScopeAndActiveTrueAndMemberSeq(
             @Param("scope") PolicyScope scope,
             @Param("memberSeq") Long memberSeq
+    );
+
+    /**
+     * 특정 회원의 MEMBER 정책 중 지정된 정책 유형만 조회
+     */
+    @Query("""
+        select p
+          from PointPolicy p
+         where p.scope = :scope
+           and p.memberSeq = :memberSeq
+           and p.policyType = :policyType
+           and p.active = true
+    """)
+    Optional<PointPolicy> findByScopeAndActiveTrueAndMemberSeqAndPolicyType(
+            @Param("scope") PolicyScope scope,
+            @Param("memberSeq") Long memberSeq,
+            @Param("policyType") PointPolicyType policyType
     );
 }

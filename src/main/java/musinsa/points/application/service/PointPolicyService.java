@@ -1,8 +1,10 @@
 package musinsa.points.application.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import musinsa.points.domain.entity.Member;
 import musinsa.points.domain.snapshot.PolicySnapshot;
+import musinsa.points.presentation.dto.response.UpdateMemberPointPolicyResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -172,5 +174,49 @@ public class PointPolicyService {
 
         // 3) 최종 폴백: 환경 기본값
         return getLong("points.policy.max-balance", 1_000_000L);
+    }
+
+    @Transactional
+    public UpdateMemberPointPolicyResponse updateMemberMaxBalanceAndRefreshCache(
+            Long memberSeq,
+            Long newMaxBalance
+    ) {
+        Objects.requireNonNull(memberSeq, "memberSeq must not be null");
+        Objects.requireNonNull(newMaxBalance, "newMaxBalance must not be null");
+
+        // 1️⃣ 기존 MEMBER 정책 조회 (없으면 새로 생성)
+        PointPolicy policy = policyRepo
+                .findByScopeAndActiveTrueAndMemberSeqAndPolicyType(
+                        PolicyScope.MEMBER,
+                        memberSeq,
+                        PointPolicyType.MAX_BALANCE_PER_MEMBER)
+                .orElseGet(() -> PointPolicy.builder()
+                        .scope(PolicyScope.MEMBER)
+                        .memberSeq(memberSeq)
+                        .policyType(PointPolicyType.MAX_BALANCE_PER_MEMBER)
+                        .active(true)
+                        .build());
+
+        // 2️⃣ 정책 값 갱신
+        policy.setPolicyValue(newMaxBalance);
+
+        policyRepo.save(policy);
+
+        // 3️⃣ 캐시(pointPolicy) 갱신: 해당 회원 캐시 evict 후 재적재
+        var cache = cacheManager.getCache("pointPolicy");
+        if (cache != null) {
+            cache.evict(memberSeq);
+            List<PointPolicy> refreshedPolicies =
+                    policyRepo.findByScopeAndActiveTrueAndMemberSeq(PolicyScope.MEMBER, memberSeq);
+            resolveForMember(refreshedPolicies); // 내부에서 캐시에 put 수행
+        }
+
+        // 4️⃣ 응답 구성
+        return UpdateMemberPointPolicyResponse.builder()
+                .memberSeq(memberSeq)
+                .maxBalance(newMaxBalance)
+                .cacheRefreshed(true)
+                .message("정책이 업데이트되고 캐시가 새로 반영되었습니다.")
+                .build();
     }
 }
