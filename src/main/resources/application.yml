@@ -1,0 +1,48 @@
+spring:
+  h2:
+    console:
+      enabled: true  
+      path: /h2-console
+      
+  datasource:
+    driver-class-name: org.h2.Driver 
+    url: jdbc:h2:mem:points;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa 
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # ← 테스트에선 이게 편합니다
+    properties:
+      hibernate:
+       show_sql: true
+       format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true   # 기존 DB에도 안전 적용
+    validate-on-migrate: true
+# OpenAPI(Swagger)
+springdoc:
+  api-docs:
+    path: /api-docs        # 기본은 /v3/api-docs, 커스텀 사용 시 여기로 노출
+  swagger-ui:
+    path: /                 # 기본은 /swagger-ui/index.html, 여기로 접속 가능
+    tags-sorter: alpha
+    operations-sorter: method
+    display-request-duration: true
+    doc-expansion: none
+
+jwt:
+  secret:
+    key: U2TOph4y60EvXvUvjqluuQVjVTCmHPU9RjU5zfMVMUqFIIvHlhiNYLechukE1FEJ+oFPpxXiJ0qDjnP0Bw==
+logging:
+  level:
+    org.flywaydb.core: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: caches, health, info
