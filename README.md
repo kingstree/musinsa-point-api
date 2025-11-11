@@ -106,8 +106,17 @@ http://localhost:8080/swagger-ui/index.html
 | ✅ **포인트 사용**    | **POST** `/api/v1/points/use`          | 만료일 기준 FIFO 차감, 사용 이력 생성 및 적립 LOT별 상세 매핑                                        |
 | ✅ **포인트 사용 취소** | **POST** `/api/v1/points/use/cancel`   | 기존 사용 상세 내역(PointUseDetail) 기반 부분/전체 취소                                         |
 | ✅ **포인트 정책 관리** | **PUT** `/api/v1/points/policy/member` | 멤버별 보유 상한 정책 갱신 및 Caffeine Cache 자동 반영                                          |
+### **🧪 테스트용 API**
+
+|**구분**|**엔드포인트**|**설명**|
+|---|---|---|
+|🔐 **Auth**|POST /v1/auth/login|테스트용 로그인 (JWT 토큰 발급)|
+|🧩 **PointPolicy**|PUT /api/v1/points/policy/member|회원별 포인트 보유 상한액 수정 및 캐시 갱신|
+|🧩 **PointPolicy**|PUT /api/v1/points/policy/global|글로벌 1회 최대 적립 한도 수정 및 캐시 갱신|
+| 🧠 **CacheDebug** | GET /api/v1/cache/policies | 현재 정책 캐시(pointPolicy) 전체 조회 |
 
 
+> ⚙️ 테스트용 API는 개발 및 검증 목적이며, 운영 시 권한 검증 로직을 강화해야 합니다.  
 > ⚙️ 모든 API는 JWT 기반 인증 후 접근 가능하며, Swagger를 통해 테스트할 수 있습니다.  
 > Swagger 주소 → [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
