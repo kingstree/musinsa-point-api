@@ -42,13 +42,13 @@ public final class GrantPointCommand {
      */
     public void validate() {
         if (memberSeq == null) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "회원 식별자(memberSeq)는 필수 값입니다.");
+            throw new BusinessException(ErrorCode.INVALID_REQUEST, "회원 식별자(memberSeq)는 필수 값입니다.");
         }
         if (amount == null || amount <= 0) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "적립 금액(amount)은 1 이상이어야 합니다.");
+            throw new BusinessException(ErrorCode.INVALID_TYPE, "적립 금액(amount)은 1 이상이어야 합니다.");
         }
         if (grantType == null) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "적립 유형(grantType)은 필수 값입니다.");
+            throw new BusinessException(ErrorCode.INVALID_REQUEST, "적립 유형(grantType)은 필수 값입니다.");
         }
     }
 

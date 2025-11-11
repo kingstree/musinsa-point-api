@@ -47,22 +47,24 @@ public class PointService {
 
         // 1️⃣ 회원 조회
         Member member = memberRepository.findById(command.getMemberSeq())
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST,"Member not found: " + command.getMemberSeq()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Member not found: " + command.getMemberSeq()));
 
         // 2️⃣ 정책 검증
         long maxPerTx   = policyService.getGlobalMaxGrantPerTx();           // GLOBAL 정책에서 조회
         long maxBalance = policyService.getMaxBalancePerMember(command.getMemberSeq()); // MEMBER 정책에서 조회
 
         if (command.getAmount() > maxPerTx) {
-            throw new IllegalStateException("1회 최대 적립 한도 초과: 요청=%d, 한도=%d"
-                    .formatted(command.getAmount(), maxPerTx));
+            throw new BusinessException(
+                    ErrorCode.INVALID_REQUEST,
+                    "1회 최대 적립 한도 초과: 요청=%d, 한도=%d".formatted(command.getAmount(), maxPerTx)
+            );
         }
 
         long currentRemain = pointRepository.sumRemainingByMember(member.getMemberSeq());
         if (currentRemain + command.getAmount() > maxBalance) {
-            throw new IllegalStateException(
-                    "보유 한도 초과: 현재=%d, 요청=%d, 한도=%d"
-                            .formatted(currentRemain, command.getAmount(), maxBalance)
+            throw new BusinessException(
+                    ErrorCode.INVALID_REQUEST,
+                    "보유 한도 초과: 현재=%d, 요청=%d, 한도=%d".formatted(currentRemain, command.getAmount(), maxBalance)
             );
         }
 
@@ -149,7 +151,7 @@ public class PointService {
 
         // 1) 대상 원장 조회
         PointGrant grant = pointRepository.findGrantById(grantId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST,"Grant not found: " + grantId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Grant not found: " + grantId));
         Member owner = grant.getMember();
 
         // 2) 상태/사용 여부 검증
@@ -198,7 +200,7 @@ public class PointService {
 
         // 1) 회원 조회
         Member member = memberRepository.findById(command.memberSeq())
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST,"Member not found: " + command.memberSeq()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Member not found: " + command.memberSeq()));
 
         // 2) 잔액 검증(잔액이 0이면 사용 X)
         long totalRemain = pointRepository.sumRemainingByMember(member.getMemberSeq());

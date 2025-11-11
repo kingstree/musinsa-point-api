@@ -59,8 +59,9 @@ public class PointGrant extends BaseTimeEntity {
                                     Instant grantedAt,
                                     Instant expiresAt,
                                     String note) {
-        if (amount <= 0)
-            throw new BusinessException(ErrorCode.INVALID_REQUEST, "적립 금액은 0보다 커야 합니다.");
+        if (amount <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_TYPE, "적립 금액은 0보다 커야 합니다.");
+        }
         PointGrant grant = PointGrant.builder()
                 .member(member)
                 .amount(amount)
@@ -83,15 +84,26 @@ public class PointGrant extends BaseTimeEntity {
     }
 
     public void consume(long useAmount) {
-        //if (useAmount > remainingAmount) throw new IllegalArgumentException("잔액 초과");
+        if (useAmount <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_TYPE, "사용 금액은 0보다 커야 합니다.");
+        }
+        if (useAmount > remainingAmount) {
+            throw new BusinessException(ErrorCode.CONFLICT, "잔액 초과: 요청=" + useAmount + ", 잔액=" + remainingAmount);
+        }
         this.remainingAmount -= useAmount;
-       // registerEvent(new GrantConsumedEvent(this.grantId, this.member.getMemberSeq(), useAmount, this.remainingAmount));
+        // registerEvent(new GrantConsumedEvent(this.grantId, this.member.getMemberSeq(), useAmount, this.remainingAmount));
     }
 
-        public void restore(long cancelAmount) {
-            this.remainingAmount += cancelAmount;
-            //registerEvent(new GrantRestoredEvent(this.grantId, this.member.getMemberSeq(), cancelAmount, this.remainingAmount));
+    public void restore(long cancelAmount) {
+        if (cancelAmount <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_TYPE, "원복 금액은 0보다 커야 합니다.");
         }
+        if (this.remainingAmount + cancelAmount > this.amount) {
+            throw new BusinessException(ErrorCode.CONFLICT, "원복 금액이 적립 원금을 초과합니다.");
+        }
+        this.remainingAmount += cancelAmount;
+        //registerEvent(new GrantRestoredEvent(this.grantId, this.member.getMemberSeq(), cancelAmount, this.remainingAmount));
+    }
 
         public void expire() {
             this.status = PointStatus.EXPIRED;
@@ -100,7 +112,9 @@ public class PointGrant extends BaseTimeEntity {
         }
 
     public void cancel() {
-        if (!canBeCancelled()) throw new BusinessException(ErrorCode.INVALID_REQUEST, "이미 일부 사용된 적립은 취소할 수 없습니다");
+        if (!canBeCancelled()) {
+            throw new BusinessException(ErrorCode.CONFLICT, "이미 일부 사용된 적립은 취소할 수 없습니다");
+        }
         this.status = PointStatus.CANCELLED;
         this.remainingAmount = 0L;
         //registerEvent(new GrantCancelledEvent(this.grantId, this.member.getMemberSeq()));

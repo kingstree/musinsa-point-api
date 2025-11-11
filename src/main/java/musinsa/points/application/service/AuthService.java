@@ -24,8 +24,8 @@ public class AuthService {
     private final CacheManager cacheManager;
 
     public String signin(LoginRequest request) {
-        Member member = memberRepository.findByMemberSeq(request.memberSeq()).orElseThrow(
-                () -> new BusinessException(ErrorCode.VALIDATION_FAILED));
+        Member member = memberRepository.findByMemberSeq(request.memberSeq())
+            .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED, "로그인 정보가 올바르지 않습니다."));
 
         String token = jwtUtil.createToken(member.getMemberSeq(),member.getRole());
 
