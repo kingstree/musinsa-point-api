@@ -9,7 +9,9 @@ import musinsa.points.common.exception.ErrorCode;
 import musinsa.points.common.response.ApiResult;
 import musinsa.points.common.response.ResponseUtil;
 import musinsa.points.common.security.service.CustomUserDetailsInfo;
+import musinsa.points.presentation.dto.request.UpdateGlobalMaxGrantPerTxRequest;
 import musinsa.points.presentation.dto.request.UpdateMemberPointPolicyRequest;
+import musinsa.points.presentation.dto.response.UpdateGlobalMaxGrantPerTxResponse;
 import musinsa.points.presentation.dto.response.UpdateMemberPointPolicyResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,4 +59,16 @@ public class PointPolicyController {
 
         return ResponseUtil.success("정책이 업데이트되었고 캐시가 새로고침되었습니다. 대상 : " + memberSeq, response);
     }
+
+    @Operation(summary = "글로벌 정책 - 1회 최대 적립 한도 수정(캐시 즉시 반영)")
+    @PutMapping("/global/max-grant-per-tx")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<ApiResult<UpdateGlobalMaxGrantPerTxResponse>> updateGlobalMaxGrantPerTx(
+            @AuthenticationPrincipal CustomUserDetailsInfo user,
+            @Valid @RequestBody UpdateGlobalMaxGrantPerTxRequest request
+    ) {
+        var resp = pointPolicyService.updateGlobalMaxGrantPerTxAndRefreshCache(request.maxGrantPerTx());
+        return ResponseUtil.success("글로벌 정책(MAX_GRANT_PER_TX)이 업데이트되었고 캐시가 새로고침되었습니다.", resp);
+    }
+
 }

@@ -74,4 +74,13 @@ public interface PointPolicyJpaRepository extends JpaRepository<PointPolicy, UUI
             @Param("memberSeq") Long memberSeq,
             @Param("policyType") PointPolicyType policyType
     );
+
+    /**
+     * 활성화된 정책 중 특정 스코프와 정책 타입에 해당하는 첫 번째 정책 조회
+     * 예: 글로벌 스코프의 MAX_GRANT_PER_TX 정책
+     */
+    Optional<PointPolicy> findFirstByScopeAndActiveTrueAndPolicyType(
+            PolicyScope scope,
+            PointPolicyType pointPolicyType
+    );
 }

@@ -2,17 +2,22 @@ package musinsa.points.application.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import musinsa.points.common.exception.BusinessException;
+import musinsa.points.common.exception.ErrorCode;
 import musinsa.points.domain.entity.PointPolicy;
 import musinsa.points.domain.enums.PointPolicyType;
 import musinsa.points.domain.enums.PolicyScope;
 import musinsa.points.domain.snapshot.PolicySnapshot;
 import musinsa.points.infrastructure.repository.PointPolicyJpaRepository;
+import musinsa.points.presentation.dto.response.UpdateGlobalMaxGrantPerTxResponse;
 import musinsa.points.presentation.dto.response.UpdateMemberPointPolicyResponse;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -215,4 +220,52 @@ public class PointPolicyService {
                 .message("정책이 업데이트되고 캐시가 새로 반영되었습니다.")
                 .build();
     }
+    /**
+     * 글로벌 정책(MAX_GRANT_PER_TX) 수정 + 캐시(pointPolicy) 즉시 반영
+     */
+    @Transactional
+    public UpdateGlobalMaxGrantPerTxResponse updateGlobalMaxGrantPerTxAndRefreshCache(long newValue) {
+
+        // 1️⃣ 입력값 검증
+        if (newValue < 1) {
+            throw new BusinessException(
+                    ErrorCode.INVALID_REQUEST,
+                    "1회 최대 적립 한도는 1 이상이어야 합니다."
+            );
+        }
+
+        // 2️⃣ 활성화된 글로벌 MAX_GRANT_PER_TX 정책 조회
+        PointPolicy policy = policyRepo
+                .findFirstByScopeAndActiveTrueAndPolicyType(PolicyScope.GLOBAL, PointPolicyType.MAX_GRANT_PER_TX)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "활성화된 글로벌 MAX_GRANT_PER_TX 정책이 존재하지 않습니다."
+                ));
+
+        // 3️⃣ 정책 값 갱신 및 저장
+        policy.setPolicyValue(newValue);
+        policyRepo.save(policy);
+
+        // 4️⃣ 캐시 무효화 (pointPolicy - GLOBAL 키)
+        Cache cache = cacheManager.getCache("pointPolicy");
+        if (cache != null) {
+            cache.evict("GLOBAL"); // 글로벌 정책 키만 제거
+        }
+
+        // 5️⃣ 캐시 재로딩 (resolveFor(null) == GLOBAL 로딩)
+        try {
+            getGlobalMaxGrantPerTx();
+        } catch (Exception ignored) {
+            // 캐시 초기화 중 예외는 무시 (다음 요청 시 자동 로딩됨)
+        }
+
+        // 6️⃣ 응답 객체 반환
+        return UpdateGlobalMaxGrantPerTxResponse.builder()
+                .policyId(policy.getPolicyId())
+                .pointPolicyType(PointPolicyType.MAX_GRANT_PER_TX)
+                .value(policy.getPolicyValue())
+                .updatedAt(policy.getModifiedDate())
+                .build();
+    }
+
 }

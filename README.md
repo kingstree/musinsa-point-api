@@ -139,6 +139,7 @@ src/
 - ✅ **Kafka 기반 포인트 이벤트 로그 비동기 처리**
     - Grant / Use / Cancel / Expire 이벤트를 Kafka 토픽으로 발행
     - Audit 및 분석 파이프라인과 연동
+    - history 이벤트 기반 생성으로 전환
 
 - ✅ **Redis 캐시 전환**
     - 현재 Caffeine Cache → Redis로 마이그레이션
