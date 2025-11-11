@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import musinsa.points.application.command.CancelUsedPointCommand;
-import musinsa.points.application.command.GrantPointCommand;
-import musinsa.points.application.command.UsePointCommand;
+import musinsa.points.application.dto.command.CancelUsedPointCommand;
+import musinsa.points.application.dto.command.GrantPointCommand;
+import musinsa.points.application.dto.command.UsePointCommand;
 import musinsa.points.application.service.PointService;
 import musinsa.points.common.exception.ErrorCode;
 import musinsa.points.common.response.ApiResult;
@@ -22,6 +22,10 @@ import musinsa.points.presentation.dto.response.CancelPointResponse;
 import musinsa.points.presentation.dto.response.CancelUsedPointResponse;
 import musinsa.points.presentation.dto.response.GrantPointResponse;
 import musinsa.points.presentation.dto.response.UsePointResponse;
+import musinsa.points.application.dto.result.GrantPointResult;
+import musinsa.points.application.dto.result.UsePointResult;
+import musinsa.points.application.dto.result.CancelPointResult;
+import musinsa.points.application.dto.result.CancelUsedPointResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -84,8 +88,8 @@ public class PointController {
                 .note(request.note())
                 .build();
         command.validate();
-
-        GrantPointResponse response = pointService.grantPoints(command);
+        GrantPointResult result = pointService.grantPoints(command);
+        GrantPointResponse response = GrantPointResponse.from(result);
         return ResponseUtil.success("성공", response);
     }
 
@@ -112,8 +116,8 @@ public class PointController {
                     "권한이 없습니다: 다른 회원의 포인트 부여를 취소할 수 없습니다."
             );
         }
-
-        CancelPointResponse response = pointService.cancelGrant(request);
+        CancelPointResult result = pointService.cancelGrant(request);
+        CancelPointResponse response = CancelPointResponse.from(result);
         return ResponseUtil.success("성공", response);
     }
 
@@ -146,8 +150,8 @@ public class PointController {
                 .useAmount(request.useAmount())
                 .createdBy(currentMemberSeq)
                 .build();
-
-        UsePointResponse response = pointService.usePoints(command);
+        UsePointResult result = pointService.usePoints(command);
+        UsePointResponse response = UsePointResponse.from(result);
         return ResponseUtil.success("성공", response);
     }
 
@@ -173,8 +177,8 @@ public class PointController {
                 .memberSeq(currentMemberSeq)
                 .createdBy(currentMemberSeq)
                 .build();
-
-        CancelUsedPointResponse response = pointService.cancelUsedPoints(command);
+        CancelUsedPointResult result = pointService.cancelUsedPoints(command);
+        CancelUsedPointResponse response = CancelUsedPointResponse.from(result);
         return ResponseUtil.success("성공", response);
     }
 

@@ -2,9 +2,9 @@ package musinsa.points.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import musinsa.points.application.command.CancelUsedPointCommand;
-import musinsa.points.application.command.GrantPointCommand;
-import musinsa.points.application.command.UsePointCommand;
+import musinsa.points.application.dto.command.CancelUsedPointCommand;
+import musinsa.points.application.dto.command.GrantPointCommand;
+import musinsa.points.application.dto.command.UsePointCommand;
 import musinsa.points.common.exception.BusinessException;
 import musinsa.points.common.exception.ErrorCode;
 import musinsa.points.domain.entity.*;
@@ -12,10 +12,10 @@ import musinsa.points.domain.enums.*;
 import musinsa.points.domain.repository.PointRepository;
 import musinsa.points.infrastructure.repository.MemberRepository;
 import musinsa.points.presentation.dto.request.CancelPointRequest;
-import musinsa.points.presentation.dto.response.CancelPointResponse;
-import musinsa.points.presentation.dto.response.CancelUsedPointResponse;
-import musinsa.points.presentation.dto.response.GrantPointResponse;
-import musinsa.points.presentation.dto.response.UsePointResponse;
+import musinsa.points.application.dto.result.CancelPointResult;
+import musinsa.points.application.dto.result.CancelUsedPointResult;
+import musinsa.points.application.dto.result.GrantPointResult;
+import musinsa.points.application.dto.result.UsePointResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +41,7 @@ public class PointService {
      * 3. 원장(point_grant) 및 이력(point_history) 저장
      */
     @Transactional
-    public GrantPointResponse grantPoints(GrantPointCommand command) {
+    public GrantPointResult grantPoints(GrantPointCommand command) {
 
         command.validate();
 
@@ -119,14 +119,14 @@ public class PointService {
         log.info("✅ Grant completed: member={}, amount={}, expires={}", member.getMemberSeq(), command.getAmount(), expiresAt);
 
         // 7️⃣ 응답 DTO 반환
-        return new GrantPointResponse(
+        return new GrantPointResult(
                 grant.getGrantId(),
                 member.getMemberSeq(),
                 grant.getAmount(),
                 grant.getRemainingAmount(),
+                grant.getGrantType(),
+                PointStatus.ACTIVE,
                 grant.getExpiresAt(),
-                grant.getGrantType().name(),
-                PointStatus.ACTIVE.name(),
                 grant.getCreatedDate()
         );
     }
@@ -145,7 +145,7 @@ public class PointService {
      *  - PointHistory에 GRANT_CANCEL 기록 (delta 음수)
      */
     @Transactional
-    public CancelPointResponse cancelGrant(final CancelPointRequest request) {
+    public CancelPointResult cancelGrant(final CancelPointRequest request) {
         Objects.requireNonNull(request, "request must not be null");
         final UUID grantId = request.grantId();
 
@@ -178,13 +178,13 @@ public class PointService {
         PointHistory pointHistory = pointRepository.saveHistory(history);
 
         // 5) 응답 구성 (point_cancel 테이블은 '사용 취소'용이라 여기서는 생성하지 않음)
-        return new CancelPointResponse(
+        return new CancelPointResult(
                 canceledPointGrant.getGrantId(),
                 owner.getMemberSeq(),
+                canceledPointGrant.getAmount(),   // 취소된 금액 = 원장 전체
+                PointStatus.CANCELLED,
                 request.reason(),
-                history.getCreatedDate(),
-                history.getModifiedDate(),
-                PointStatus.CANCELLED.name()
+                history.getCreatedDate()
         );
     }
 
@@ -196,7 +196,7 @@ public class PointService {
      *  - 동일 만료일이면 선입선출(FIFO)
      */
     @Transactional
-    public UsePointResponse usePoints(final UsePointCommand command) {
+    public UsePointResult usePoints(final UsePointCommand command) {
 
         // 1) 회원 조회
         Member member = memberRepository.findById(command.memberSeq())
@@ -221,7 +221,7 @@ public class PointService {
                 .build();
         pointRepository.saveUse(use);
 
-        List<UsePointResponse.UseDetail> detailViews = new ArrayList<>();
+        List<UsePointResult.UseDetail> detailViews = new ArrayList<>();
 
         long remainToUse = usePoint;
         // 4) 차감 대상 그랜트 조회 (우선순위 정렬 반영된 쿼리)
@@ -246,11 +246,11 @@ public class PointService {
             pointRepository.saveUseDetail(detail);
 
             // 응답용 뷰 누적
-            detailViews.add(new UsePointResponse.UseDetail(
+            detailViews.add(new UsePointResult.UseDetail(
                     grant.getGrantId(),
                     deduct,
                     grant.getRemainingAmount(),
-                    grant.getGrantType().name(),
+                    grant.getGrantType(),
                     grant.getExpiresAt()
             ));
 
@@ -274,12 +274,12 @@ public class PointService {
         pointRepository.saveHistory(history);
 
         // 6) 응답 조립
-        return new UsePointResponse(
+        return new UsePointResult(
                 use.getUseId(),
                 member.getMemberSeq(),
                 use.getOrderNo(),
                 use.getUsedAmount(),
-                use.getStatus().name(),
+                use.getStatus(),
                 use.getCreatedDate(),
                 detailViews
         );
@@ -293,7 +293,7 @@ public class PointService {
      *  - 이미 만료된 적립분은 재적립 처리
      */
     @Transactional
-    public CancelUsedPointResponse cancelUsedPoints(final CancelUsedPointCommand command) {
+    public CancelUsedPointResult cancelUsedPoints(final CancelUsedPointCommand command) {
         Objects.requireNonNull(command, "command must not be null");
 
         // 1️⃣ 사용 이력 조회
@@ -324,7 +324,7 @@ public class PointService {
                 .toList();
 
         long remainingCancel = cancelAmount;
-        List<CancelUsedPointResponse.CancelDetail> cancelDetails = new ArrayList<>();
+        List<CancelUsedPointResult.CancelDetail> cancelDetails = new ArrayList<>();
         long regrantTotal = 0L;
 
         for (PointUseDetail detail : details) {
@@ -380,7 +380,7 @@ public class PointService {
 
             pointRepository.saveCancelRecord(cancelRecord);
 
-            cancelDetails.add(new CancelUsedPointResponse.CancelDetail(
+            cancelDetails.add(new CancelUsedPointResult.CancelDetail(
                     grant.getGrantId(),
                     refund,
                     regranted,
@@ -406,15 +406,24 @@ public class PointService {
                 .build();
         pointRepository.saveHistory(history);
 
-        // 5️⃣ 응답
-        return new CancelUsedPointResponse(
-                use.getUseId(),
-                member.getMemberSeq(),
-                cancelAmount,
-                regrantTotal,
-                history.getCreatedDate(),
-                cancelDetails
-        );
+
+        long newCanceledTotal = canceledSoFar + cancelAmount;
+        UseStatus newStatus = (newCanceledTotal == usedAmount)
+                ? UseStatus.CANCELLED
+                : UseStatus.PARTIAL_CANCELLED;
+
+        // 응답
+        return CancelUsedPointResult.builder()
+                .cancelId(null) // 현재는 detail별 PointCancel을 여러 건 생성하므로 대표 ID가 없으면 null 유지
+                .useId(use.getUseId())
+                .memberSeq(member.getMemberSeq())
+                .cancelAmount(cancelAmount)
+                .regrantNeededAmount(regrantTotal)
+                .status(newStatus)
+                .reason(command.reason())
+                .cancelledAt(history.getCreatedDate())
+                .CancelDetails(cancelDetails)   // ✅ 새로 추가된 상세 목록 포함
+                .build();
     }
 
 }

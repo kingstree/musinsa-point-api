@@ -1,4 +1,4 @@
-package musinsa.points.application.command;
+package musinsa.points.application.dto.command;
 
 import lombok.Builder;
 import lombok.Getter;

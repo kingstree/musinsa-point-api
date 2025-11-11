@@ -1,5 +1,8 @@
 package musinsa.points.presentation.dto.response;
 
+import lombok.Builder;
+import musinsa.points.application.dto.result.UsePointResult;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +18,7 @@ import java.util.UUID;
  * @param usedAt      사용 시각
  * @param details     각 적립 로트별 차감 상세 내역
  */
+@Builder
 public record UsePointResponse(
         UUID useId,
         Long memberSeq,
@@ -24,7 +28,14 @@ public record UsePointResponse(
         Instant usedAt,
         List<UseDetail> details
 ) {
-
+    public static UsePointResponse from(UsePointResult r) {
+        return UsePointResponse.builder()
+                .useId(r.useId())
+                .memberSeq(r.memberSeq())
+                .orderNo(r.orderNo())
+                .usedAt(r.usedAt())
+                .build();
+    }
     /**
      * 적립 로트별 사용 상세 내역
      *
